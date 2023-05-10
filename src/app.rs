@@ -53,7 +53,11 @@ impl eframe::App for SpaceTradersApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        let Self { user_name, user_token, .. } = self;
+        let Self {
+            user_name,
+            user_token,
+            ..
+        } = self;
 
         // Examples of how to create different panels and windows.
         // Pick whichever suits you.
@@ -87,7 +91,7 @@ impl eframe::App for SpaceTradersApp {
                         *user_token = Some("Fake token".to_string());
                     }
                 });
-            } else { 
+            } else {
                 ui.heading(format!("Welcome back to Space Traders, {} 🚀", user_name));
             }
 
