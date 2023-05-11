@@ -84,7 +84,11 @@ impl eframe::App for SpaceTradersApp {
                 ui.add_space(10f32);
                 ui.group(|registration| {
                     registration.set_max_width(
-                        registration.available_width() / 3f32
+                        if registration.available_width() < 400. {
+                            registration.available_width()
+                        } else {
+                            registration.available_width() / 3f32
+                        }
                     );
                     registration.label("Choose your trader name");
                     registration.add_space(10.);
@@ -122,13 +126,16 @@ impl eframe::App for SpaceTradersApp {
         });
 
         egui::TopBottomPanel::bottom("debug_panel").show(ctx, |ui| {
+            ui.add_space(5.);
             if let None = *user_token {
                 ui.set_enabled(false);
             }
             let clear_state = ui.button("Clear State");
             if clear_state.clicked() {
                 *user_token = None;
+                *user_name = DEFAULT_USER_NAME.to_string();
             }
+            ui.add_space(3.);
         });
     }
 }
