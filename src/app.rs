@@ -1,4 +1,6 @@
-use egui::Button;
+use egui::{Button, TextEdit, TextStyle, Layout, Align};
+
+const MAX_PLAYER_NAME_LEN: u8 = 15;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -12,7 +14,8 @@ pub struct SpaceTradersApp {
     value: f32,
 }
 
-const DEFAULT_USER_NAME: &'static str = "SpaceCowboy3000";
+const DEFAULT_USER_NAME: &'static str = "";
+const SAMPLE_USER_NAME: &'static str = "SpaceCowboy3000";
 
 impl Default for SpaceTradersApp {
     fn default() -> Self {
@@ -59,9 +62,6 @@ impl eframe::App for SpaceTradersApp {
             ..
         } = self;
 
-        // Examples of how to create different panels and windows.
-        // Pick whichever suits you.
-        // Tip: a good default choice is to just keep the `CentralPanel`.
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
         #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
@@ -81,10 +81,33 @@ impl eframe::App for SpaceTradersApp {
 
             if let None = *user_token {
                 ui.heading("Welcome to Space Traders 🚀");
+                ui.add_space(10f32);
                 ui.group(|registration| {
-                    registration.label("Let's register you for your new trading adventure");
-                    registration.text_edit_multiline(user_name);
-                    let start_buttom = Button::new("Space Country, let's ride");
+                    registration.set_max_width(
+                        registration.available_width() / 3f32
+                    );
+                    registration.label("Choose your trader name");
+                    registration.add_space(10.);
+                    let mut name_holder = (*user_name).clone();
+                    let name_field = TextEdit::singleline(&mut name_holder)
+                        .desired_width(registration.available_width())
+                        .font(TextStyle::Monospace)
+                        .hint_text(SAMPLE_USER_NAME);
+                    let field = registration.add(name_field);
+                    registration.with_layout(Layout::right_to_left(Align::TOP), |label| {
+                        label.add_space(10.);
+                        label.label(format!("{} / {}", user_name.len(), MAX_PLAYER_NAME_LEN));
+                    });
+
+                    if field.changed() {
+                        if name_holder.len() > MAX_PLAYER_NAME_LEN.into() {
+                            name_holder.truncate(MAX_PLAYER_NAME_LEN.into());
+                        }
+                        *user_name = name_holder.clone();
+                    }
+                    registration.add_space(10.);
+
+                    let start_buttom = Button::new("Ready to trade!");
                     let is_valid = Self::is_entered_username_valid(user_name);
                     let start = registration.add_enabled(is_valid, start_buttom);
                     if start.clicked() {
@@ -99,6 +122,9 @@ impl eframe::App for SpaceTradersApp {
         });
 
         egui::TopBottomPanel::bottom("debug_panel").show(ctx, |ui| {
+            if let None = *user_token {
+                ui.set_enabled(false);
+            }
             let clear_state = ui.button("Clear State");
             if clear_state.clicked() {
                 *user_token = None;
