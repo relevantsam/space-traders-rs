@@ -1,6 +1,6 @@
 mod app;
 mod client;
 mod components;
-mod models;
 mod constants;
+mod models;
 pub use app::SpaceTradersApp;

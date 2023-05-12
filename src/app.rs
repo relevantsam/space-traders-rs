@@ -1,6 +1,6 @@
 use egui::Button;
 
-use crate::{models::user_state::{UserState}, components::user_registration::registration_ui};
+use crate::{components::user_registration::registration_ui, models::user_state::UserState};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -17,7 +17,7 @@ impl Default for SpaceTradersApp {
     fn default() -> Self {
         Self {
             user_state: UserState::default(),
-            value: 0.
+            value: 0.,
         }
     }
 }
@@ -46,7 +46,6 @@ impl eframe::App for SpaceTradersApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
         #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
@@ -69,7 +68,10 @@ impl eframe::App for SpaceTradersApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             if self.user_state.token.is_some() {
-                ui.heading(format!("Welcome back to Space Traders, {} 🚀", self.user_state.name));
+                ui.heading(format!(
+                    "Welcome back to Space Traders, {} 🚀",
+                    self.user_state.name
+                ));
                 return;
             }
             ui.heading("Welcome to Space Traders 🚀");
